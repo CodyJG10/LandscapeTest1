@@ -13,6 +13,6 @@ COPY . .
 ENV PATH /opt/node_modules/.bin:$PATH
 RUN chown -R node:node /opt/app
 USER node
-RUN ["node", "--max-old-space-size=1536", "/opt/node_modules/.bin/yarn", "build"]
+RUN NODE_OPTIONS="--max-old-space-size=1536" yarn build
 EXPOSE 1337
 CMD ["yarn", "develop"]
