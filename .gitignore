@@ -1,8 +1,9 @@
 .DS_Store
 
-# Local Ansible deployment inputs
-ansible/vars.yml
-ansible/inventory
+# Local deployment inputs — never commit these
+infrastructure/ansible/vars.yml
+infrastructure/ansible/inventory
+infrastructure/cloudflare/vars.sh
 
 # Root-level environment files
 .env
