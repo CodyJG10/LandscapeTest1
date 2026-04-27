@@ -34,7 +34,7 @@
         force: false
         accept_hostkey: true
 
-    # ── Backend .env and port assignment ──────────────────────────────────────
+    # ── Backend port assignment ────────────────────────────────────────────────
 
     - name: Check if backend .env file exists
       ansible.builtin.stat:
@@ -99,14 +99,9 @@
         strapi_port: "{{ _existing_strapi_port.stdout | trim }}"
       when: env_file.stat.exists
 
-    - name: Create backend .env from template (only when missing)
-      ansible.builtin.template:
-        src: templates/strapi.env.j2
-        dest: "{{ backend_path }}/.env"
-        mode: "0644"
-      when: not env_file.stat.exists
-
-    # ── Frontend .env and port assignment (must happen BEFORE containers start) ─
+    # ── Frontend port assignment (must come BEFORE backend .env is written) ────
+    # FRONTEND_PORT lives in Backend/.env so docker-compose can substitute it
+    # in the ports: section. We determine it here for both new and re-deploys.
 
     - name: Check if frontend .env exists
       ansible.builtin.stat:
@@ -149,6 +144,22 @@
         frontend_port: "{{ _existing_frontend_port.stdout | trim }}"
       when: "deploy_frontend_vps | default(false) and (frontend_env_file.stat.exists | default(false))"
 
+    # ── Create .env files (backend first, both ports now known) ───────────────
+
+    - name: Create backend .env from template (only when missing)
+      ansible.builtin.template:
+        src: templates/strapi.env.j2
+        dest: "{{ backend_path }}/.env"
+        mode: "0644"
+      when: not env_file.stat.exists
+
+    - name: Ensure FRONTEND_PORT is in backend .env (re-deploys and idempotency)
+      ansible.builtin.lineinfile:
+        path: "{{ backend_path }}/.env"
+        regexp: '^FRONTEND_PORT='
+        line: "FRONTEND_PORT={{ frontend_port }}"
+      when: deploy_frontend_vps | default(false)
+
     - name: Create frontend .env from template (only when missing)
       ansible.builtin.template:
         src: templates/frontend.env.j2
@@ -156,7 +167,7 @@
         mode: "0644"
       when: "deploy_frontend_vps | default(false) and not (frontend_env_file.stat.exists | default(false))"
 
-    # ── Start containers (both .env files exist by this point) ────────────────
+    # ── Start containers (all .env files exist, ports correctly wired) ────────
 
     - name: Build and start containers
       ansible.builtin.shell:
