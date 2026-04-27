@@ -49,7 +49,7 @@ echo ""
 
 echo "-- Strapi connection --"
 # Default to the backend domain already entered
-BACKEND_DOMAIN=$(grep 'domain_name:' "$VARS_FILE" | head -1 | sed 's/.*: *"\?\([^"]*\)"\?.*/\1/')
+BACKEND_DOMAIN=$(grep 'domain_name:' "$VARS_FILE" | head -1 | sed 's/^[^:]*: *//; s/"//g')
 PUBLIC_STRAPI_URL=$(prompt "Public Strapi URL" "https://$BACKEND_DOMAIN")
 echo ""
 echo "  Strapi API Token — used by the frontend to authenticate API requests."
