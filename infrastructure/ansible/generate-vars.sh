@@ -43,7 +43,7 @@ warn() { echo "  $*" >&2; }
 # ── guard against overwrite ───────────────────────────────────────────────────
 if [[ -f "$OUT_FILE" ]]; then
   read -rp "vars.yml already exists. Overwrite? [y/N] " confirm
-  [[ "${confirm,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+  [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 fi
 
 echo ""

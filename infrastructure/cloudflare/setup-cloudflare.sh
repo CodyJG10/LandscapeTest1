@@ -74,7 +74,7 @@ fi
 # ── guard against overwrite ───────────────────────────────────────────────────
 if [[ -f "$VARS_FILE" ]]; then
   read -rp "vars.sh already exists. Overwrite? [y/N] " confirm_ow
-  [[ "${confirm_ow,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+  [[ "$confirm_ow" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 fi
 
 echo ""

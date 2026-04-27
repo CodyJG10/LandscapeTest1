@@ -84,7 +84,7 @@ run_cicd_setup() {
     echo "  You connected with a password. CI/CD needs an SSH key."
     read -rp "  Generate a deploy key, install it on the VPS, and add to GitHub? [Y/n]: " _gk
     _gk="${_gk:-y}"
-    if [[ "${_gk,,}" =~ ^y ]]; then
+    if [[ "$_gk" =~ ^[Yy] ]]; then
       local deploy_key
       deploy_key="$(mktemp /tmp/forge_deploy_XXXXXX)"
       ssh-keygen -t ed25519 -C "forge-deploy@$SITE_NAME" -f "$deploy_key" -N "" -q
